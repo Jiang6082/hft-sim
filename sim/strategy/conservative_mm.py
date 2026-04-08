@@ -8,12 +8,12 @@ from sim.strategy.base import MarketSnapshot, PlaceOrder, StrategyAction
 
 
 @dataclass
-class DumbMarketMaker:
+class ConservativeMarketMaker:
     owner: str = "mm"
-    quote_size: int = 2
-    entry_spread: int = 2
-    profit_target: int = 1
-    max_position: int = 4
+    quote_size: int = 1
+    entry_spread: int = 1
+    profit_target: int = 2
+    max_position: int = 2
     _next_oid: int = field(default=1, init=False)
     _last_entry_price: int | None = field(default=None, init=False)
 
@@ -22,26 +22,12 @@ class DumbMarketMaker:
             return []
 
         spread = snapshot.best_ask - snapshot.best_bid
-        if snapshot.position == 0:
-            if spread <= self.entry_spread and self.quote_size <= self.max_position:
-                return [
-                    self._place(
-                        side=Side.BUY,
-                        price=snapshot.best_ask,
-                        qty=self.quote_size,
-                    )
-                ]
-            return []
+        if snapshot.position == 0 and spread <= self.entry_spread:
+            return [self._place(side=Side.BUY, price=snapshot.best_ask, qty=self.quote_size)]
 
         if snapshot.position > 0 and self._last_entry_price is not None:
             if snapshot.best_bid >= self._last_entry_price + self.profit_target:
-                return [
-                    self._place(
-                        side=Side.SELL,
-                        price=snapshot.best_bid,
-                        qty=snapshot.position,
-                    )
-                ]
+                return [self._place(side=Side.SELL, price=snapshot.best_bid, qty=snapshot.position)]
 
         return []
 

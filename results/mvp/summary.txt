@@ -1,0 +1,6 @@
+MVP simulation summary
+total_pnl=49.00
+sharpe=1.68
+max_drawdown=18.00
+num_fills=31
+ending_position=2

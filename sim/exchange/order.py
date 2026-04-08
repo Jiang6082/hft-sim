@@ -27,3 +27,7 @@ class Order:
     qty: int
     filled: int = 0
     status: OrderStatus = OrderStatus.PENDING
+
+    @property
+    def remaining(self) -> int:
+        return self.qty - self.filled
